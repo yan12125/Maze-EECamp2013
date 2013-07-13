@@ -153,33 +153,26 @@ namespace Maze
 
         public void SetMap()
         {
-            string[] lines = File.ReadAllLines(@"..\..\MazeMap\Map1.txt");
-            if (lines.Length != 12)
+            int w = 17;
+            int h = 12;
+            MazeGen gen = new MazeGen(w, h);
+            int[,] maze;
+            do
             {
-                MessageBox.Show("Invalid map file");
-                return;
-            }
-            for (int i = 0; i < 12; ++i)
+                maze = gen.generate(0, 0);
+            } while (maze[w - 1, h - 1] != 0);
+            for (int i = 0; i < w; ++i)
             {
-                if (lines[i].Length != 16)
+                for (int j = 0; j < h; ++j)
                 {
-                    MessageBox.Show("Invalid map file: syntax error at line "+i);
-                    return;
-                }
-                for (int j = 0; j < 16; ++j)
-                {
-                    if (i == 0 && j == 0)
-                    {
-                        continue;
-                    }
-                    if (lines[i][j] == '0')
+                    if (maze[i, j] != 1)
                     {
                         continue;
                     }
                     Border rect = new Border();
                     rect.Background = new SolidColorBrush(Colors.Blue);
-                    Grid.SetRow(rect, i);
-                    Grid.SetColumn(rect, j);
+                    Grid.SetRow(rect, j);
+                    Grid.SetColumn(rect, i);
                     rect.Height = Double.NaN;
                     rect.Width = Double.NaN;
                     Maze.Children.Add(rect);

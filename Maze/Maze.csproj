@@ -83,6 +83,7 @@
     <Compile Include="Map.xaml.cs">
       <DependentUpon>Map.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MazeGen.cs" />
     <Compile Include="Player.xaml.cs">
       <DependentUpon>Player.xaml</DependentUpon>
     </Compile>
