@@ -12,7 +12,7 @@
                 <Border.RenderTransform>
                     <TranslateTransform x:Name="PlayerMove"/>
                 </Border.RenderTransform>
-                <local:Player x:Name="Player" Speed="5" View="100" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                <local:Player x:Name="Player" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
             </Border>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>

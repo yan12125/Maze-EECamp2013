@@ -27,8 +27,8 @@ namespace Maze
         public Player()
         {
             InitializeComponent();
-            Speed = 1;
-            View = 5;
+            Speed = 10;
+            View = 5000;
         }
     }
 }

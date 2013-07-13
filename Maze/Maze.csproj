@@ -113,7 +113,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Resource Include="Image\1306200319.gif" />
   </ItemGroup>
