@@ -205,12 +205,23 @@ namespace Maze
         }
         protected void updateClip()
         {
-            Maze.Clip = new EllipseGeometry()
+            Point center = new Point(PlayerMove.X + Player.Width / 2, PlayerMove.Y + Player.Height / 2);
+            double r = Player.View;
+            if (Maze.Clip == null)
             {
-                Center = new Point(PlayerMove.X + Player.Width / 2, PlayerMove.Y + Player.Height / 2),
-                RadiusX = Player.View,
-                RadiusY = Player.View
-            };
+                Maze.Clip = new EllipseGeometry()
+                {
+                    Center = center,
+                    RadiusX = r,
+                    RadiusY = r
+                };
+            }
+            else
+            {
+                EllipseGeometry e = Maze.Clip as EllipseGeometry;
+                e.Center = center;
+                e.RadiusX = e.RadiusY = r;
+            }
         }
     }
 }
