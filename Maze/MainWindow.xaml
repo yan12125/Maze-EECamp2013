@@ -5,5 +5,7 @@
         Title="MainWindow" SizeToContent="WidthAndHeight">
     <Grid>
         <local:Map x:Name="Map" IsHitTestVisible="True" Focusable="True" Margin="50" Height="600" Width="800" />
+        <Label Content="00:00" HorizontalAlignment="Left" Margin="50,12,0,0" Name="elapsed_time" VerticalAlignment="Top" FontSize="16" />
+        <Label Content="Maze #1" Height="28" HorizontalAlignment="Left" Margin="133,12,0,0" Name="MazeName" VerticalAlignment="Top" FontSize="16" />
     </Grid>
 </Window>

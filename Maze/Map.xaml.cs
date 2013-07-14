@@ -24,28 +24,29 @@ namespace Maze
     public partial class Map : UserControl
     {
         private List<Border> _wall = new List<Border>();
+        protected Border lastGrid = new Border();
         protected Dictionary<Key, bool> keyPressed = new Dictionary<Key,bool>();
         protected List<Key> pressedSeq = new List<Key>();
-        protected System.Windows.Forms.Timer timer;
+        public EventHandler PlayerArrived;
 
         public Map()
         {
             InitializeComponent();
             AddHandler(Keyboard.KeyDownEvent, (KeyEventHandler)HandleKeyDownEvent);
             AddHandler(Keyboard.KeyUpEvent, (KeyEventHandler)HandleKeyUpEvent);
-            _wall.Clear();
-            SetMap();
             keyPressed.Add(Key.Up, false);
             keyPressed.Add(Key.Down, false);
             keyPressed.Add(Key.Left, false);
             keyPressed.Add(Key.Right, false);
-            timer = new System.Windows.Forms.Timer();
-            timer.Interval = 50;
-            timer.Tick += new EventHandler(timer_Tick);
-            timer.Start();
+            // last grid for checking arrival
+            Grid.SetRow(lastGrid, Maze.RowDefinitions.Count - 1);
+            Grid.SetColumn(lastGrid, Maze.ColumnDefinitions.Count - 1);
+            lastGrid.Background = Brushes.Transparent;
+            lastGrid.Width = lastGrid.Height = Double.NaN;
+            Maze.Children.Add(lastGrid);
         }
 
-        void timer_Tick(object sender, EventArgs e)
+        public void timer_Tick(object sender, EventArgs e)
         {
             MovePlayer();
             updateClip();
@@ -56,6 +57,10 @@ namespace Maze
          */
         private void HandleKeyDownEvent(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.F9) // for debugging
+            {
+                Player.View = 5000;
+            }
             if (e.IsRepeat)
             {
                 return;
@@ -149,18 +154,27 @@ namespace Maze
                     return;
                 }
             }
+            checkArrive();
         }
 
-        public void SetMap()
+        protected void checkArrive()
         {
-            int w = 17;
-            int h = 12;
-            MazeGen gen = new MazeGen(w, h);
-            int[,] maze;
-            do
+            if (InArea(PlayerBorder, lastGrid))
             {
-                maze = gen.generate(0, 0);
-            } while (maze[w - 1, h - 1] != 0);
+                PlayerArrived.Invoke(this, new EventArgs());
+            }
+        }
+
+        public void SetMap(int[,] maze)
+        {
+            int w = Maze.ColumnDefinitions.Count;
+            int h = Maze.RowDefinitions.Count;
+            PlayerMove.X = PlayerMove.Y = 0;
+            for (int i = 0; i < _wall.Count; i++)
+            {
+                Maze.Children.Remove(_wall[i]);
+            }
+            _wall.Clear();
             for (int i = 0; i < w; ++i)
             {
                 for (int j = 0; j < h; ++j)

@@ -1,3 +1,9 @@
+/*
+ * Using Depth First Search
+ * References: 
+ * http://en.wikipedia.org/wiki/Maze_generation_algorithm
+ * http://rosettacode.org/wiki/Maze_generation Java version
+ */
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -90,6 +96,7 @@ public class MazeGen
     protected DIR direction(int x, int y)
     {
         DIR[] dirs = { DIR.N, DIR.E, DIR.W, DIR.S };
+        // Reference: http://stackoverflow.com/questions/273313
         IEnumerable<DIR> _dirs = dirs.OrderBy(a => Guid.NewGuid());
         foreach(DIR dir in _dirs)
         {
