@@ -54,7 +54,7 @@ public class MazeGen
         {
             generate_impl(initX, initY);
         } while (maze[finalX, finalY] != 0 || solution.Length <= hardness);
-        maze[finalX, finalY] = -1;
+        maze[finalX, finalY] = 7;
         return maze;
     }
     
@@ -183,5 +183,18 @@ public class MazeGen
         string outputStr = String.Join(", \n", output);
         outputStr += "\n// " + solution.Length + " steps";
         File.WriteAllText(filename, outputStr);
+    }
+
+    public void WriteToFile2(string filename, string mapName)
+    {
+        string output = "EECamp2013 Advanced Program Project -- Maze\nMapEditor by yan12125.\n-- Map Name\n" + mapName + "\n-- Map Details\n";
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                output += maze[j, i].ToString();
+            }
+        }
+        File.WriteAllText(filename, output);
     }
 }

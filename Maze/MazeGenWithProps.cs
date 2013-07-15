@@ -5,7 +5,7 @@ public class MazeGenWithProps : MazeGen
 {
     protected Random gen = new Random();
     // l => larger; s => smaller
-    protected enum Props { lView = 2, sView, lSpeed, sSpeed, FakeWall };
+    protected enum Props { none = 0, lView = 2, sView, lSpeed, sSpeed, FakeWall };
     
     public MazeGenWithProps(int w, int h, int hardness)
         : base(w, h, hardness)
@@ -16,8 +16,8 @@ public class MazeGenWithProps : MazeGen
     {
         base.generate(initX, initY, finalX, finalY);
         putFakeWall();
-        putSpeedTools();
-        putViewTools();
+        addPropToGrids(70, Props.lSpeed, Props.sSpeed);
+        addPropToGrids(70, Props.lView, Props.sView);
         return maze;
     }
 
@@ -26,51 +26,24 @@ public class MazeGenWithProps : MazeGen
         // fake walls shouldn't be at the first and the last grid
         // and I put it at the second half of the way
         // Note: solution is a Stack
-        int start = (int)Math.Round(solution.Length / 4.0);
-        int end = (int)Math.Round(3 * solution.Length / 4.0);
-        int index = gen.Next(start, end);
-        maze[solution[index].Item1, solution[index].Item2] = (int)Props.FakeWall;
-    }
-
-    protected void putSpeedTools()
-    {
-        for (int i = 0; i < solution.Length; i++)
+        int start = (int)Math.Round(solution.Length / 6.0);
+        int end = (int)Math.Round(5 * solution.Length / 6.0);
+        int nFakeWallsOnRoad = gen.Next(6);
+        for (int i = 0; i < nFakeWallsOnRoad; )
         {
-            DIR dir = checkDirection(solution[i]);
-            if (dir != DIR.none && gen.Next(100) < 10)
+            int index = gen.Next(start, end);
+            int nextX = solution[index].Item1;
+            int nextY = solution[index].Item2;
+            if(maze[nextX, nextY] == 0)
             {
-                setPoint(solution[i], Props.lSpeed, dir);
-            }
-            if (gen.Next(100) < 5)
-            {
-                setPoint(solution[i], Props.sSpeed);
+                maze[nextX, nextY] = (int)Props.FakeWall;
+                i++;
             }
         }
-        addPropToNormalGrids(70, Props.lSpeed, Props.sSpeed);
+        addPropToGrids(80, Props.FakeWall, Props.none, true);
     }
 
-    protected void putViewTools()
-    {
-        for (int i = 0; i < solution.Length; i++)
-        {
-            DIR dir = checkDirection(solution[i]);
-            if(dir != DIR.none)
-            {
-                int d = gen.Next(100);
-                if (d < 10)
-                {
-                    setPoint(solution[i], Props.lView, dir);
-                }
-                else if (d < 30)
-                {
-                    setPoint(solution[i], Props.sView, dir);
-                }
-            }
-        }
-        addPropToNormalGrids(70, Props.lView, Props.sView);
-    }
-
-    protected void addPropToNormalGrids(int probability, Props prop1, Props prop2)
+    protected void addPropToGrids(int probability, Props prop1, Props prop2, bool preventSolution = false)
     {
         int nProps = 0;
         int failedTry = 0;
@@ -79,8 +52,8 @@ public class MazeGenWithProps : MazeGen
             int x = gen.Next(width);
             int y = gen.Next(height);
             PointXY pt = new PointXY(x, y);
-            // http://www.dotnetperls.com/array-indexof
-            if (maze[x, y] == 0 && Array.IndexOf<PointXY>(solution, pt) == -1)
+            int idx = Array.IndexOf<PointXY>(solution, pt);
+            if (maze[x, y] == 0 && (!preventSolution || idx == -1))
             {
                 setPoint(pt, (gen.Next(100) < probability) ? prop1 : prop2);
                 nProps++;
@@ -89,48 +62,17 @@ public class MazeGenWithProps : MazeGen
             {
                 failedTry++;
             }
-            if (nProps >= 20 || failedTry >= width * height)
+            if (nProps >= 10 || failedTry >= width * height)
             {
                 break;
             }
         }
     }
 
-    protected DIR checkDirection(int x, int y)
-    {
-        if (!checkRange(x, y))
-        {
-            return DIR.none;
-        }
-        foreach (DIR dir in getRandomDirections())
-        {
-            int nextX = x + dx[dir];
-            int nextY = y + dy[dir];
-            PointXY pt = new PointXY(nextX, nextY);
-            if (checkRange(nextX, nextY) &&
-                Array.IndexOf<PointXY>(solution, pt) != -1 &&
-                maze[nextX, nextY] == 0)
-            {
-                return dir;
-            }
-        }
-        return DIR.none;
-    }
-
-    protected DIR checkDirection(PointXY pt)
-    {
-        return checkDirection(pt.Item1, pt.Item2);
-    }
-
     protected bool setPoint(PointXY pt, Props prop, DIR dir = DIR.none)
     {
-        return setPoint(pt.Item1, pt.Item2, prop, dir);
-    }
-
-    protected bool setPoint(int x, int y, Props prop, DIR dir = DIR.none)
-    {
-        int nextX = x + dx[dir];
-        int nextY = y + dy[dir];
+        int nextX = pt.Item1 + dx[dir];
+        int nextY = pt.Item2 + dy[dir];
         if (maze[nextX, nextY] != 0)
         {
             return false;

@@ -179,10 +179,11 @@ namespace Maze
             {
                 { 1, Brushes.Blue }, 
                 { 2, Brushes.Yellow }, 
-                { 3, Brushes.Green }, 
-                { 4, Brushes.Gray }, 
-                { 5, Brushes.Pink }, 
-                { 6, Brushes.Blue }
+                { 3, Brushes.Red }, 
+                { 4, Brushes.Aquamarine }, 
+                { 5, Brushes.Purple }, 
+                { 6, Brushes.Blue }, 
+                { 7, Brushes.Transparent }
             };
             for (int i = 0; i < w; ++i)
             {

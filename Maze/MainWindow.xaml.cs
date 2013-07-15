@@ -67,9 +67,9 @@ namespace Maze
             for (int i = 0; i < maps.Length; i++)
             {
                 maps[i] = new int[w, h];
-                MazeGenWithProps gen = new MazeGenWithProps(w, h, 60);
+                MazeGenWithProps gen = new MazeGenWithProps(w, h, 50);
                 maps[i] = gen.generate();
-                gen.WriteToFile(@"..\..\MazeMap\Map" + (i+1) + ".txt");
+                gen.WriteToFile2(@"..\..\MazeMap\Map" + (i+1) + ".emz", "Map " + (i + 1));
             }
         }
 

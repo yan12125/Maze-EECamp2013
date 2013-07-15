@@ -1,0 +1,17 @@
+Simple Maze Game for EECamp 2013
+
+Maze generator: MazeGen.cs and MazeGenWithProps.cs
+Generated maps has properties listed below: 
+1. Only speed tools, view tools and fake walls supported
+2. There is only one solution (I denote the solution as "on the way")
+3. Starts at (0, 0) and ends at (15, 11)
+4. On the way, there are 0~5 fake walls, and there are up to 10
+   fake walls not on the way
+5. Speed tools and view tools are randomly put on empty grids. 70% for
+   increasing ones and 30% for decreasing ones.
+
+Other facts about the Maze game: 
+1. Press F9 to toggle cheating mode (開燈)
+2. The program generates 6 maps at startup and saves maps to 
+   MazeMap/MapX.emz
+
