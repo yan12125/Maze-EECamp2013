@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 // using alias
 // Reference: http://blog.miniasp.com/post.aspx?id=27b3b6ab-f104-4386-b2a1-cc448d04d1c3
 using Timer = System.Windows.Forms.Timer;
+using PointXY = System.Tuple<int, int>;
 
 namespace Maze
 {
@@ -66,11 +67,9 @@ namespace Maze
             for (int i = 0; i < maps.Length; i++)
             {
                 maps[i] = new int[w, h];
-                MazeGen gen = new MazeGen(w, h);
-                do
-                {
-                    maps[i] = gen.generate(0, 0);
-                } while (maps[i][w - 1, h - 1] != 0);
+                MazeGenWithProps gen = new MazeGenWithProps(w, h, 60);
+                maps[i] = gen.generate();
+                gen.WriteToFile(@"..\..\MazeMap\Map" + (i+1) + ".txt");
             }
         }
 
@@ -95,7 +94,7 @@ namespace Maze
         protected void nextMap()
         {
             Map.SetMap(maps[mapIndex]);
-            MazeName.Content = "Maze #" + (mapIndex + 1);
+            MazeName.Content = "Maze #" + (mapIndex + 1).ToString();
             mapIndex++;
             Map.Visibility = Visibility.Visible;
             changeScene.From = 0.0;

@@ -15,6 +15,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using PointXY = System.Tuple<int, int>;
 
 namespace Maze
 {
@@ -28,6 +29,7 @@ namespace Maze
         protected Dictionary<Key, bool> keyPressed = new Dictionary<Key,bool>();
         protected List<Key> pressedSeq = new List<Key>();
         public EventHandler PlayerArrived;
+        protected bool cheating = false;
 
         public Map()
         {
@@ -59,7 +61,7 @@ namespace Maze
         {
             if (e.Key == Key.F9) // for debugging
             {
-                Player.View = 5000;
+                toggleCheating();
             }
             if (e.IsRepeat)
             {
@@ -170,27 +172,37 @@ namespace Maze
             int w = Maze.ColumnDefinitions.Count;
             int h = Maze.RowDefinitions.Count;
             PlayerMove.X = PlayerMove.Y = 0;
-            for (int i = 0; i < _wall.Count; i++)
-            {
-                Maze.Children.Remove(_wall[i]);
-            }
+            // first two children are PlayerBorder and lastGrid
+            Maze.Children.RemoveRange(2, Maze.Children.Count - 2);
             _wall.Clear();
+            var colors = new Dictionary<int, Brush>()
+            {
+                { 1, Brushes.Blue }, 
+                { 2, Brushes.Yellow }, 
+                { 3, Brushes.Green }, 
+                { 4, Brushes.Gray }, 
+                { 5, Brushes.Pink }, 
+                { 6, Brushes.Blue }
+            };
             for (int i = 0; i < w; ++i)
             {
                 for (int j = 0; j < h; ++j)
                 {
-                    if (maze[i, j] != 1)
+                    if(maze[i, j] >= 1)
                     {
-                        continue;
+                        Border rect = new Border();
+                        rect.Background = colors[maze[i, j]];
+                        Grid.SetRow(rect, j);
+                        Grid.SetColumn(rect, i);
+                        rect.Height = Double.NaN;
+                        rect.Width = Double.NaN;
+                        Panel.SetZIndex(rect, 2);
+                        Maze.Children.Add(rect);
+                        if (maze[i, j] == 1)
+                        {
+                            _wall.Add(rect);
+                        }
                     }
-                    Border rect = new Border();
-                    rect.Background = new SolidColorBrush(Colors.Blue);
-                    Grid.SetRow(rect, j);
-                    Grid.SetColumn(rect, i);
-                    rect.Height = Double.NaN;
-                    rect.Width = Double.NaN;
-                    Maze.Children.Add(rect);
-                    _wall.Add(rect);
                 }
             }
             updateClip();
@@ -229,6 +241,12 @@ namespace Maze
                 e.Center = center;
                 e.RadiusX = e.RadiusY = r;
             }
+        }
+
+        public void toggleCheating()
+        {
+            cheating = !cheating;
+            Player.toggleCheating(cheating);
         }
     }
 }

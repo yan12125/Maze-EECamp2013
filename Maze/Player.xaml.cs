@@ -22,13 +22,23 @@ namespace Maze
     public partial class Player : UserControl
     {
         public int Speed { get; set; }
-        public int View { get; set; }
+        protected int _View;
+        public int View {
+            get { return cheating?5000:_View; }
+            set { this._View = value; }
+        }
+        protected bool cheating = false;
 
         public Player()
         {
             InitializeComponent();
             Speed = 10;
             View = 50;
+        }
+
+        public void toggleCheating(bool _cheating)
+        {
+            cheating = _cheating;
         }
     }
 }

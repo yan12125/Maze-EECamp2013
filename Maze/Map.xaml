@@ -8,14 +8,13 @@
              d:DesignHeight="600" d:DesignWidth="800" Focusable="True">
     <Canvas Background="Black">
         <Grid x:Name="Maze" Background="White" Height="600" Width="800">
-            <Border x:Name="PlayerBorder" Width="30" Height="30">
+            <Border x:Name="PlayerBorder" Width="30" Height="30" Panel.ZIndex="3">
                 <Border.RenderTransform>
                     <TranslateTransform x:Name="PlayerMove"/>
                 </Border.RenderTransform>
                 <local:Player x:Name="Player" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
             </Border>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>

@@ -5,8 +5,10 @@
  * http://rosettacode.org/wiki/Maze_generation Java version
  */
 using System;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using PointXY = System.Tuple<int, int>;
 
 public class MazeGen
 {
@@ -14,28 +16,49 @@ public class MazeGen
     
     protected int height;
     protected int width;
+    protected int finalX;
+    protected int finalY;
+    protected int hardness;
     protected int[,] maze;
+    protected Stack<PointXY> path = new Stack<PointXY>();
+    protected PointXY[] solution;
     protected Dictionary<DIR, int> dx = new Dictionary<DIR, int>() { 
         { DIR.N, 0 }, 
         { DIR.E, 1 }, 
         { DIR.W, -1 }, 
-        { DIR.S, 0 }
+        { DIR.S, 0 }, 
+        { DIR.none, 0 }
     };
     protected Dictionary<DIR, int> dy = new Dictionary<DIR, int>() {
         { DIR.N, -1 }, 
         { DIR.E, 0 }, 
         { DIR.W, 0 }, 
-        { DIR.S, 1 }
+        { DIR.S, 1 }, 
+        { DIR.none, 0 }
     };
+    protected DIR[] dirs = { DIR.N, DIR.E, DIR.W, DIR.S };
     
-    public MazeGen(int w, int h)
+    public MazeGen(int w, int h, int minimalHardness = 0)
     {
         width = w;
         height = h;
+        hardness = minimalHardness;
         maze = new int[width, height];
     }
+
+    public virtual int[,] generate(int initX = 0, int initY = 0, int _finalX = -1, int _finalY = -1)
+    {
+        finalX = (_finalX == -1) ? (width - 1) : _finalX;
+        finalY = (_finalY == -1) ? (height - 1) : _finalY;
+        do
+        {
+            generate_impl(initX, initY);
+        } while (maze[finalX, finalY] != 0 || solution.Length <= hardness);
+        maze[finalX, finalY] = -1;
+        return maze;
+    }
     
-    public int[,] generate(int initX, int initY)
+    protected void generate_impl(int initX, int initY)
     {
         for(int i = 0;i < width;i++)
         {
@@ -45,9 +68,9 @@ public class MazeGen
             }
         }
         maze[initX, initY] = 0; // no wall at the initial location
-        int x = initX, y = initY;
-        Stack<Tuple<int, int>> path = new Stack<Tuple<int, int>>();
-        path.Push(new Tuple<int, int>(x, y));
+        int x = initX;
+        int y = initY;
+        pushPointToPath(x, y);
         bool outerRun = true;
         while (outerRun)
         {
@@ -57,7 +80,7 @@ public class MazeGen
                 x += dx[dir];
                 y += dy[dir];
                 maze[x, y] = 0;
-                path.Push(new Tuple<int, int>(x, y));
+                pushPointToPath(x, y);
             }
             else
             {
@@ -81,24 +104,30 @@ public class MazeGen
                     else
                     {
                         // the original point was just popped 
-                        path.Push(new Tuple<int, int>(x, y));
+                        pushPointToPath(x, y);
                         x += dx[dir2];
                         y += dy[dir2];
                         maze[x, y] = 0;
-                        path.Push(new Tuple<int, int>(x, y));
+                        pushPointToPath(x, y);
                     }
                 }
             }
         }
-        return maze;
+    }
+
+    protected void pushPointToPath(int x, int y)
+    {
+        path.Push(new Tuple<int, int>(x, y));
+        if (x == finalX && y == finalY)
+        {
+            solution = new Tuple<int, int>[path.Count];
+            path.CopyTo(solution, 0);
+        }
     }
     
     protected DIR direction(int x, int y)
     {
-        DIR[] dirs = { DIR.N, DIR.E, DIR.W, DIR.S };
-        // Reference: http://stackoverflow.com/questions/273313
-        IEnumerable<DIR> _dirs = dirs.OrderBy(a => Guid.NewGuid());
-        foreach(DIR dir in _dirs)
+        foreach(DIR dir in getRandomDirections())
         {
             int nextX = x + dx[dir];
             int nextY = y + dy[dir];
@@ -131,5 +160,28 @@ public class MazeGen
     protected bool checkRange(int x, int y)
     {
         return (0 <= x && x < width) && (0 <= y && y < height);
+    }
+
+    protected IEnumerable<DIR> getRandomDirections()
+    {
+        // Reference: http://stackoverflow.com/questions/273313
+        return dirs.OrderBy(a => Guid.NewGuid());
+    }
+
+    public void WriteToFile(string filename)
+    {
+        string[] output = new string[height];
+        for(int i = 0;i < height;i++)
+        {
+            int[] tempArr = new int[width];
+            for (int j = 0; j < width; j++)
+            {
+                tempArr[j] = maze[j, i];
+            }
+            output[i] = "{" + String.Join(", ", tempArr) + "}";
+        }
+        string outputStr = String.Join(", \n", output);
+        outputStr += "\n// " + solution.Length + " steps";
+        File.WriteAllText(filename, outputStr);
     }
 }
