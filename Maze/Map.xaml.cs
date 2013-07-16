@@ -182,27 +182,40 @@ namespace Maze
                 { 3, Brushes.Red }, 
                 { 4, Brushes.Aquamarine }, 
                 { 5, Brushes.Purple }, 
-                { 6, Brushes.Blue }, 
-                { 7, Brushes.Transparent }
+                { 6, Brushes.Blue }
+            };
+            var pics = new Dictionary<int, string>()
+            {
+                { 0, "floor.png" }, 
+                { 7, "exit.jpg" }
             };
             for (int i = 0; i < w; ++i)
             {
                 for (int j = 0; j < h; ++j)
                 {
-                    if(maze[i, j] >= 1)
+                    int propId = maze[i, j];
+                    Border rect = new Border();
+                    if(colors.ContainsKey(propId))
                     {
-                        Border rect = new Border();
-                        rect.Background = colors[maze[i, j]];
-                        Grid.SetRow(rect, j);
-                        Grid.SetColumn(rect, i);
-                        rect.Height = Double.NaN;
-                        rect.Width = Double.NaN;
-                        Panel.SetZIndex(rect, 2);
-                        Maze.Children.Add(rect);
-                        if (maze[i, j] == 1)
-                        {
-                            _wall.Add(rect);
-                        }
+                        rect.Background = colors[propId];
+                    }
+                    else if (pics.ContainsKey(propId))
+                    {
+                        rect.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Image/" + pics[propId])));
+                    }
+                    else
+                    {
+                        rect.Background = Brushes.Transparent;
+                    }
+                    Grid.SetRow(rect, j);
+                    Grid.SetColumn(rect, i);
+                    rect.Height = Double.NaN;
+                    rect.Width = Double.NaN;
+                    Panel.SetZIndex(rect, 2);
+                    Maze.Children.Add(rect);
+                    if (propId == 1)
+                    {
+                        _wall.Add(rect);
                     }
                 }
             }
