@@ -30,6 +30,7 @@ namespace Maze
         protected List<Key> pressedSeq = new List<Key>();
         public EventHandler PlayerArrived;
         protected bool cheating = false;
+        protected int[,] maze;
 
         public Map()
         {
@@ -153,10 +154,44 @@ namespace Maze
                 {
                     PlayerMove.X = temp_Player_X;
                     PlayerMove.Y = temp_Player_Y;
+                    moveIfKaJian();
                     return;
                 }
             }
             checkArrive();
+        }
+
+        // Ka Jian 卡鍵... I don't have suitable word for it
+        protected void moveIfKaJian()
+        {
+            int gridX = (int)Math.Round((PlayerMove.X + PlayerBorder.ActualWidth / 2) / lastGrid.ActualWidth);
+            int gridY = (int)Math.Round((PlayerMove.Y + PlayerBorder.ActualHeight / 2) / lastGrid.ActualHeight);
+            Key[] keys = new Key[] { Key.Up, Key.Down, Key.Left, Key.Right };
+            var dx = new Dictionary<Key, int> { 
+                { Key.Up, 0 }, { Key.Down, 0 }, 
+                { Key.Left, -1 }, { Key.Right, 1 }
+            };
+            var dy = new Dictionary<Key, int> { 
+                { Key.Up, -1 }, { Key.Down, 1 }, 
+                { Key.Left, 0 }, { Key.Right, 0 }
+            };
+            foreach (Key key in keys)
+            {
+                int newX = gridX + dx[key];
+                int newY = gridY + dy[key];
+                if (keyPressed[key] && checkRange(newX, newY) && maze[newX, newY] != 1)
+                {
+                    PlayerMove.X = gridX * lastGrid.ActualWidth;
+                    PlayerMove.Y = gridY * lastGrid.ActualHeight;
+                    break;
+                }
+            }
+        }
+
+        protected bool checkRange(int x, int y)
+        {
+            return (0 <= x && x < Maze.ColumnDefinitions.Count - 1) &&
+                   (0 <= y && y < Maze.RowDefinitions.Count - 1);
         }
 
         protected void checkArrive()
@@ -167,8 +202,9 @@ namespace Maze
             }
         }
 
-        public void SetMap(int[,] maze)
+        public void SetMap(int[,] _maze)
         {
+            maze = _maze;
             int w = Maze.ColumnDefinitions.Count;
             int h = Maze.RowDefinitions.Count;
             PlayerMove.X = PlayerMove.Y = 0;
